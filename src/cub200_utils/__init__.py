@@ -1,5 +1,5 @@
 from .io_utils import (
-    donwload_dataset,
+    download_dataset,
     extract_dataset,
     fetch_core_metadata, 
     fetch_split, 
