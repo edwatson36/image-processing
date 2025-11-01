@@ -15,4 +15,5 @@ See notebooks/cub_200_2011_preprocessing.ipynb for full e2e use of the functions
 
 
 Disclaimers:
-Still a work in progress with more rigorous unit testing to be done and some deprecation warnings to resolve.
+Package isn't fully tested yet - therefore may get errors.
+Functions are still a work in progress with more rigorous unit testing to be done and some deprecation warnings to resolve.
