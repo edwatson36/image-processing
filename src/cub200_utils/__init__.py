@@ -16,5 +16,4 @@ from .img_display_utils import (
 from .tf_utils import (
     preprocess_image,
     df_to_dataset,
-    create_tf_datasets
-)
+    create_tf_datasets)
