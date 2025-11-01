@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import tensorflow as tf
 from tensorflow.keras import layers, Model
 from tensorflow.keras.utils import load_img, img_to_array
 from pathlib import Path
