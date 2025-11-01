@@ -11,7 +11,7 @@ cub200_utils/
 How to import into a notebook:
 from cub200_utils import *
 
-See cub_200_2011_preprocessing.ipynb notebook for full e2e use of the functions defined here and integration with a basic model.
+See notebooks/cub_200_2011_preprocessing.ipynb for full e2e use of the functions defined here and integration with a basic model.
 
 
 Disclaimers:
