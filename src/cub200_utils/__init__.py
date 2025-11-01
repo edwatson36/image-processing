@@ -1,4 +1,6 @@
 from .io_utils import (
+    donwload_dataset,
+    extract_dataset,
     fetch_core_metadata, 
     fetch_split, 
     merge_metadata, 
