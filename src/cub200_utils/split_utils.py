@@ -1,5 +1,6 @@
 import plotly.express as px
 import pandas as pd
+from sklearn.model_selection import train_test_split
 from typing import List, Dict, Tuple
 
 # Perform split - calls merge_data() and then creates the splits
