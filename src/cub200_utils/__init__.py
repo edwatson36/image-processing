@@ -6,9 +6,11 @@ from .io_utils import (
     merge_metadata, 
     fetch_sample_images)
 from .split_utils import (
+    create_test_split,
+    create_validation_split,
     check_class_balance,
     check_no_overlap)
-from img_display_utils import (
+from .img_display_utils import (
     plot_sample_images, 
     show_batch)
 from .tf_utils import (
