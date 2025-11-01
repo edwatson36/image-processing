@@ -3,7 +3,8 @@ cub200_utils/
 │
 ├── __init__.py
 ├── io_utils.py           # fetching and merging metadata
-├── validation_utils.py   # class balance + overlap checks
+├── img_display_utils.py  # fetching and plotting images from file or tf batch
+├── split_utils.py        # create test and validation splits, class balance + overlap checks
 ├── tf_utils.py           # preprocessing, augmentation, tf.Dataset pipeline
 └── constants.py          # file names, column names, etc.
 
