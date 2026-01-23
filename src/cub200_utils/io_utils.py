@@ -13,46 +13,61 @@ import tarfile
 from urllib.request import urlretrieve
 import pandas as pd
 import random
+from typing import List, Dict, Tuple
 from .constants import CORE_METADATA_FILES, COLUMNS
 
 # Download data function
-def download_dataset(url: str = DATA_URL, save_path: Path = ARCHIVE_PATH) -> Path:
+def download_dataset(data_dir: Path, url: str = DATA_URL, archive_name: str = ARCHIVE_NAME) -> Path:
     """Download dataset archive if not already present."""
-    save_path.parent.mkdir(parents=True, exist_ok=True)
-    if not save_path.exists():
+    data_dir.mkdir(parents=True, exist_ok=True)
+    archive_path = data_dir / archive_name
+    if not archive_path.exists():
         print(f"Downloading dataset from {url}...")
-        urlretrieve(url, save_path)
+        urlretrieve(url, archive_path)
         print("Download complete.")
     else:
         print("Archive already exists.")
-    return save_path
+    return archive_path
 
 
 # Extract data function
-def extract_dataset(archive_path: Path = ARCHIVE_PATH, extract_to: Path = EXTRACT_DIR) -> Path:
+def extract_dataset(archive_path: Path, extract_path: Path | None = None, dataset_name: str = DATASET_NAME) -> Path:
     """Extract dataset from tar archive."""
-    if not extract_to.exists():
+    # Define the extract_path, if given. Default to using the archive_path
+    # For use if you want the extracts to be in a different location to the download
+    if extract_path is None:
+        extract_path = archive_path.parent
+
+    dataset_path = extract_path / dataset_name
+
+    if not dataset_path.exists():
         print(f"Extracting {archive_path}...")
         with tarfile.open(archive_path, "r:gz") as tar:
-            tar.extractall(path=extract_to.parent, filter = 'data')
+            tar.extractall(path=extract_path.parent, filter="data")
         print("Extraction complete.")
     else:
         print("Dataset already extracted.")
-    return extract_to
+    return dataset_path
 
 
 # Fetch train-test split
 def fetch_split(dataset_dir: Path) -> pd.DataFrame:
     """
-    Fetch the CUB_200_2011 train-test split file 'train_test_split.txt' and return as df.
+    Fetch the train/test split metadata for the CUB_200_2011 dataset.
+
+    This function fetches the split file using ``CORE_METADATA_FILES["split"]``
+    and parses it using column definitions from ``COLUMNS["split"]``.
 
     Args:
-        dataset_dir (Path): Path to the folder containing the split file.
+        dataset_dir (Path): Root directory of the extracted CUB_200_2011 dataset.
 
     Returns:
-        pd.DataFrame: DataFrame with columns ['image_id', 'is_training'].
+        pd.DataFrame: DataFrame mapping image IDs to a training flag.
+
+    Raises:
+        FileNotFoundError: If the split metadata file cannot be found.
     """
-    split_path = dataset_dir / 'train_test_split.txt'
+    split_path = dataset_dir / CORE_METADATA_FILES["split"]
     if not split_path.exists():
         raise FileNotFoundError(f"Missing split file: {split_path}")
 
@@ -60,27 +75,34 @@ def fetch_split(dataset_dir: Path) -> pd.DataFrame:
         split_path,
         sep=" ",
         header=None,
-        names=["image_id", "is_training"]
+        names=COLUMNS["split"]
     )
-    print(f"Loaded split file 'train_test_split.txt' with {len(split_df)} entries")
+    print(f"Loaded split file {CORE_METADATA_FILES["split"]} with {len(split_df)} entries")
     return split_df
 
 
 # Fetch core metadata files (image_id, class)
 def fetch_core_metadata(dataset_dir: Path) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """
-    Fetch the CUB_200_2011 files containing image_id, image_path, class_id, class_name and return as df.
-    Files fetched: images.txt, image_class_labels.txt, classes.txt
+    Fetch the image_id, image_path, class_id, and class_name metadata for the CUB_200_2011 dataset.
+
+    This function fetches the required metadata files using ''CORE_METADATA_FILES'' and
+    parses them using column definitions from ''COLUMNS''.
 
     Args:
-        dataset_dir (Path): Path to the folder containing the metadata files.
+        dataset_dir (Path): Root directory of the extracted CUB_200_2011 dataset.
 
     Returns:
         Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
             (images_df, image_class_labels_df, classes_df)
+
+    Raises:
+        FileNotFoundError: If any of the required files cannot be found.
     """
     # File names
-    filename_list = ["images.txt", "image_class_labels.txt", "classes.txt"]
+    filename_list = [CORE_METADATA_FILES["images"],
+                     CORE_METADATA_FILES["image_class_labels"],
+                     CORE_METADATA_FILES["classes"]]
 
     # Check file paths
     for filename in filename_list:
@@ -89,9 +111,9 @@ def fetch_core_metadata(dataset_dir: Path) -> Tuple[pd.DataFrame, pd.DataFrame, 
             raise FileNotFoundError(f"Missing file: {file_path}")
 
     # Load core metadata files
-    images_df = pd.read_csv(dataset_dir / filename_list[0], sep = " ", header=None, names=["image_id", "image_path"])
-    image_class_labels_df = pd.read_csv(dataset_dir / filename_list[1], sep = " ", header=None, names=["image_id", "class_id"])
-    classes_df = pd.read_csv(dataset_dir / filename_list[2], sep = " ", header=None, names=["class_id", "class_name"])
+    images_df = pd.read_csv(dataset_dir / filename_list[0], sep = " ", header=None, names=COLUMNS["images"])
+    image_class_labels_df = pd.read_csv(dataset_dir / filename_list[1], sep = " ", header=None, names=COLUMNS["image_class_labels"])
+    classes_df = pd.read_csv(dataset_dir / filename_list[2], sep = " ", header=None, names=COLUMNS["classes"])
 
     print(f"Loaded {filename_list[0]}, {filename_list[1]}, {filename_list[2]} with {len(images_df)}, {len(image_class_labels_df)}, and {len(classes_df)} entries respectively")
     return images_df, image_class_labels_df, classes_df
@@ -100,15 +122,25 @@ def fetch_core_metadata(dataset_dir: Path) -> Tuple[pd.DataFrame, pd.DataFrame, 
 # Merge metadata
 def merge_metadata(dataset_dir: Path) -> pd.DataFrame:
     """
-    Merge the core metadata files and train-test split into a single DataFrame.
+    Merge metadata fetched by fetch_core_metadata() with train-test split fetched by fetch_split().
 
     Args:
-        dataset_dir (Path): Path to the folder containing the metadata and train-test split files.
+        dataset_dir (Path): Root directory of the extracted CUB_200_2011 dataset.
 
     Returns:
         pd.DataFrame:
             DataFrame with columns ['image_id', 'image_path', 'class_id', 'class_name', 'is_training'].
+
+    Raises:
+        FileNotFoundError: If any of the required files cannot be found.
+        ValueError: If the output DataFrame is empty.
+
     """
+    # NOTE:
+    # This function could be further generalized by refactoring
+    # fetch_core_metadata() to return a dict of DataFrames and driving
+    # the merge logic via a declarative MERGE_PLAN in constants.py.
+
     # Fetch core metadata
     images_df, image_class_labels_df, classes_df = fetch_core_metadata(dataset_dir)
 
@@ -118,10 +150,26 @@ def merge_metadata(dataset_dir: Path) -> pd.DataFrame:
     # Merge
     merged_df = (
         images_df
-        .merge(image_class_labels_df, on="image_id")
-        .merge(classes_df, on="class_id")
-        .merge(split_df, on="image_id")
+        .merge(image_class_labels_df,
+               on=JOIN_KEYS["image_labels"],
+               validate=JOIN_VALIDATION["image_labels"])
+        .merge(classes_df,
+               on=JOIN_KEYS["class_labels"],
+               validate=JOIN_VALIDATION["class_labels"])
+        .merge(split_df,
+               on=JOIN_KEYS["image_split"],
+               validate=JOIN_VALIDATION["image_split"])
     )
+
+    if merged_df.empty:
+        raise ValueError(
+            f"Merged metadata is empty. Check input files and join keys."
+            f"Sizes: "
+            f"images={len(images_df)}, "
+            f"labels={len(image_class_labels_df)}, "
+            f"classes={len(classes_df)}, "
+            f"split={len(split_df)}"
+        )
 
     print(
         f"Merged metadata: {len(merged_df)} rows, "
