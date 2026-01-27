@@ -1,3 +1,4 @@
+from pathlib import Path
 import plotly.express as px
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -58,9 +59,9 @@ def create_validation_split(
     train_sub_df = train_sub_df.reset_index(drop=True)
     val_sub_df = val_sub_df.reset_index(drop=True)
 
-    print(f"🔹 Training subset: {len(train_sub_df)} images, "
+    print(f"Training subset: {len(train_sub_df)} images, "
           f"{train_sub_df['class_id'].nunique()} classes")
-    print(f"🔹 Validation subset: {len(val_sub_df)} images, "
+    print(f"Validation subset: {len(val_sub_df)} images, "
           f"{val_sub_df['class_id'].nunique()} classes")
 
     return train_sub_df, val_sub_df
