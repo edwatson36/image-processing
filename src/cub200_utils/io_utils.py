@@ -14,7 +14,15 @@ from urllib.request import urlretrieve
 import pandas as pd
 import random
 from typing import List, Dict, Tuple
-from .constants import CORE_METADATA_FILES, COLUMNS
+from constants import (
+    DATA_URL,
+    ARCHIVE_NAME,
+    DATASET_NAME,
+    CORE_METADATA_FILES,
+    COLUMNS,
+    JOIN_KEYS,
+    JOIN_VALIDATION,
+)
 
 # Download data function
 def download_dataset(data_dir: Path, url: str = DATA_URL, archive_name: str = ARCHIVE_NAME) -> Path:
