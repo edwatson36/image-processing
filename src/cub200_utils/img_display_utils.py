@@ -1,9 +1,7 @@
 import matplotlib.pyplot as plt
 import tensorflow as tf
-from tensorflow.keras import layers, Model
-from tensorflow.keras.utils import load_img, img_to_array
+from tensorflow.keras.utils import load_img
 from pathlib import Path
-from typing import List, Dict, Tuple
 
 # Plot given images
 def plot_sample_images(images_paths: list[Path], target_size: tuple[int, int] | None = None) -> None:
