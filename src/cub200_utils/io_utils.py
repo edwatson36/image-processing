@@ -5,7 +5,7 @@ from urllib.request import urlretrieve
 import pandas as pd
 import random
 from typing import List, Dict, Tuple
-from constants import (
+from .constants import (
     DATA_URL,
     ARCHIVE_NAME,
     DATASET_NAME,
