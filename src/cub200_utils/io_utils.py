@@ -42,7 +42,7 @@ def extract_dataset(archive_path: Path, extract_path: Path | None = None, datase
     if not dataset_path.exists():
         print(f"Extracting {archive_path}...")
         with tarfile.open(archive_path, "r:gz") as tar:
-            tar.extractall(path=extract_path.parent, filter="data")
+            tar.extractall(path=extract_path, filter="data")
         print("Extraction complete.")
     else:
         print("Dataset already extracted.")
