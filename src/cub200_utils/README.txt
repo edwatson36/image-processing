@@ -1,5 +1,3 @@
-**PACKAGE NOT TESTED**
-
 Package structure:
 cub200_utils/
 │
@@ -12,9 +10,7 @@ cub200_utils/
 
 
 How to import into a notebook:
-from cub200_utils import *
+!pip install git+https://github.com/edwatson36/image-processing.git
+import cub200_utils
 
-See notebooks/cub_200_2011_preprocessing.ipynb for full e2e use of the functions defined here and integration with a basic model.
-
-Disclaimer:
-Package isn't e2e tested yet - therefore may get errors.
+See notebooks/preprocessing_using_cub200_Utils_lib.ipynb for full e2e use of the functions defined here and integration with a basic model.
