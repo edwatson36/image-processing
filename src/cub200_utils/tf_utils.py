@@ -1,7 +1,7 @@
 import tensorflow as tf
 import pandas as pd
 from pathlib import Path
-from constants import CLASS_FLAG, IMAGE_PATH
+from .constants import CLASS_FLAG, IMAGE_PATH
 
 # Preprocess image and encode class label
 def preprocess_image(
