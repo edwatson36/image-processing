@@ -36,6 +36,6 @@ SPLIT_FLAG = "is_training"
 TRAIN_VALUE = 1
 TEST_VALUE = 0
 
-STRATIFY_FLAG = "class_id"
+CLASS_FLAG = "class_id"
 
 IMAGE_ID = "image_id"
