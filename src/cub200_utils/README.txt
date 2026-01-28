@@ -16,8 +16,5 @@ from cub200_utils import *
 
 See notebooks/cub_200_2011_preprocessing.ipynb for full e2e use of the functions defined here and integration with a basic model.
 
-
-Disclaimers:
-Package isn't tested yet - therefore may get errors, particularly around .py files missing necessary libraries.
-Functions are still a work in progress with more rigorous unit testing to be done and some deprecation warnings to resolve.
-Functions aren't adapted to use constants.py yet.
+Disclaimer:
+Package isn't e2e tested yet - therefore may get errors.
