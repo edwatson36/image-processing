@@ -35,3 +35,5 @@ JOIN_VALIDATION = {
 SPLIT_FLAG = "is_training"
 TRAIN_VALUE = 1
 TEST_VALUE = 0
+
+STRATIFY_FLAG = "class_id"
