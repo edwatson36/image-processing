@@ -29,5 +29,11 @@ __all__ = [
     "create_test_split",
     "create_validation_split",
     "create_tf_datasets",
+    "check_no_overlap",
     "plot_class_balance",
+    "plot_sample_images", 
+    "show_batch",
+    "preprocess_image",
+    "df_to_dataset",
+    "create_tf_datasets"
 ]
