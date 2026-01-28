@@ -31,3 +31,7 @@ JOIN_VALIDATION = {
     "image_split": "one_to_one",
     "class_labels": "many_to_one",
 }
+
+SPLIT_FLAG = "is_training"
+TRAIN_VALUE = 1
+TEST_VALUE = 0
