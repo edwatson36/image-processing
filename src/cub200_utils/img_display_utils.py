@@ -4,7 +4,7 @@ from tensorflow.keras.utils import load_img
 from pathlib import Path
 
 # Plot given images
-def plot_sample_images(images_path: list[Path], target_size: tuple[int, int] | None = None) -> None:
+def plot_sample_images(image_paths: list[Path], target_size: tuple[int, int] | None = None) -> None:
     """
     Plots a list of image paths in a single row.
 
