@@ -1,26 +1,34 @@
+from pathlib import Path
 import plotly.express as px
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from typing import List, Dict, Tuple
+from io_utils import merge_metadata
+from constants import SPLIT_FLAG, TRAIN_VALUE, TEST_VALUE, CLASS_FLAG, IMAGE_ID
 
 # Perform split - calls merge_data() and then creates the splits
 def create_test_split(dataset_dir: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
-    Create official train-test split for the CUB-200-2011 as dfs with image_path information
+    Create the official train/test split for the CUB-200-2011 dataset.
+
+    This function loads the merged metadata and partitions it into
+    training and test DataFrames based on the dataset-defined split flag.
 
     Args:
-        dataset_dir (Path): Path to the folder containing the metadata and train-test split.
-    
+        dataset_dir (Path): Root directory of the extracted CUB-200-2011 dataset.
+
     Returns:
-        (train_df, test_df): Two DataFrames with columns:
-            ['image_id', 'image_path', 'class_id', 'class_name', 'is_training']
+        tuple[pd.DataFrame, pd.DataFrame]:
+            (train_df, test_df), two DataFrames containing image-level
+            metadata and labels corresponding to the official training
+            and test splits. Column definitions are determined by merge_metadata().
     """
     # Create merged df
     merged_df = merge_metadata(dataset_dir)
 
     # Create train-test split
-    train_df = merged_df[merged_df["is_training"] == 1].reset_index(drop=True)
-    test_df = merged_df[merged_df["is_training"] == 0].reset_index(drop=True)
+    train_df = merged_df[merged_df[SPLIT_FLAG] == TRAIN_VALUE].reset_index(drop=True)
+    test_df = merged_df[merged_df[SPLIT_FLAG] == TEST_VALUE].reset_index(drop=True)
 
     print(f"Total images: {len(merged_df)}")
     print(f"Train: {len(train_df)} | Test: {len(test_df)} | Train_Classes: {train_df['class_id'].nunique()}| Test_Classes: {test_df['class_id'].nunique()}")
@@ -46,7 +54,7 @@ def create_validation_split(
     Returns:
         Tuple[pd.DataFrame, pd.DataFrame]: (train_sub_df, val_sub_df)
     """
-    stratify_labels = train_df["class_id"] if stratify else None
+    stratify_labels = train_df[CLASS_FLAG] if stratify else None
 
     train_sub_df, val_sub_df = train_test_split(
         train_df,
@@ -58,9 +66,9 @@ def create_validation_split(
     train_sub_df = train_sub_df.reset_index(drop=True)
     val_sub_df = val_sub_df.reset_index(drop=True)
 
-    print(f"🔹 Training subset: {len(train_sub_df)} images, "
+    print(f"Training subset: {len(train_sub_df)} images, "
           f"{train_sub_df['class_id'].nunique()} classes")
-    print(f"🔹 Validation subset: {len(val_sub_df)} images, "
+    print(f"Validation subset: {len(val_sub_df)} images, "
           f"{val_sub_df['class_id'].nunique()} classes")
 
     return train_sub_df, val_sub_df
@@ -71,9 +79,9 @@ def check_no_overlap(train_df: pd.DataFrame, val_df: pd.DataFrame, test_df: pd.D
     """
     Checks that there are no overlapping images between train, validation, and test sets using set operator &
     """
-    train_ids = set(train_df['image_id'])
-    val_ids = set(val_df['image_id'])
-    test_ids = set(test_df['image_id'])
+    train_ids = set(train_df[IMAGE_ID])
+    val_ids = set(val_df[IMAGE_ID])
+    test_ids = set(test_df[IMAGE_ID])
 
     # Compute intersections between sets with &
     overlap_train_val = train_ids & val_ids
@@ -90,18 +98,20 @@ def check_no_overlap(train_df: pd.DataFrame, val_df: pd.DataFrame, test_df: pd.D
 # Define function to plot class balance
 def plot_class_balance(dfs: dict[str, pd.DataFrame]) -> None:
     """
-    Plot cumulative class distribution for each dataset split using Plotly.
+    Plot cumulative class distribution for each given dataset split.
 
     Args:
         dfs (dict[str, pd.DataFrame]): Dictionary of DataFrames, e.g.
             {"train": train_df, "val": val_df, "test": test_df}
+    Returns:
+        None
     """
     plot_data = []
 
     for name, df in dfs.items():
         # Count images per class
         class_counts = (
-            df["class_id"]
+            df[CLASS_FLAG]
             .value_counts()
             .sort_values()
             .reset_index()
@@ -131,9 +141,11 @@ def plot_class_balance(dfs: dict[str, pd.DataFrame]) -> None:
         }
     )
 
+    max_classes = max(df[CLASS_FLAG].nunique() for df in dfs.values())
+
     fig.update_layout(
         yaxis=dict(range=[0, 100]),
-        xaxis=dict(title="Class Rank (1–200)"),
+        xaxis=dict(title=f"Class Rank (1-{max_classes})"),
         template="plotly_white",
         legend=dict(title="Split", orientation="h", y=-0.25, x=0.3)
     )
