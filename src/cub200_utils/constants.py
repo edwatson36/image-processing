@@ -39,3 +39,4 @@ TEST_VALUE = 0
 CLASS_FLAG = "class_id"
 
 IMAGE_ID = "image_id"
+IMAGE_PATH = "image_path"
