@@ -3,8 +3,8 @@ import plotly.express as px
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from typing import List, Dict, Tuple
-from io_utils import merge_metadata
-from constants import SPLIT_FLAG, TRAIN_VALUE, TEST_VALUE, CLASS_FLAG, IMAGE_ID
+from .io_utils import merge_metadata
+from .constants import SPLIT_FLAG, TRAIN_VALUE, TEST_VALUE, CLASS_FLAG, IMAGE_ID
 
 # Perform split - calls merge_data() and then creates the splits
 def create_test_split(dataset_dir: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
